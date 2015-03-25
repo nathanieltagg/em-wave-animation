@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     xml:lang="en">
+<head> 
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+ 
+<title>Polarization Demo</title>
+
+<!-- My little icon in the link url -->
+<!-- <link rel="icon"  type="image/png" href="front_page/a" />   -->
+
+
+<!-- Javascript libraries and code. -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+  if (window['loadFirebugConsole']) {
+      window.loadFirebugConsole();
+  } else {
+    if (!window['console'])   window.console = {};
+    if (!window.console['time']      ) window.console.time        = function(){};
+    if (!window.console['timeEnd']   ) window.console.timeEnd     = function(){};
+    if (!window.console['debug']     ) window.console.debug       = function(){};
+    if (!window.console['info']      ) window.console.info        = function(){};
+    if (!window.console['log']       ) window.console.log         = function(){};
+    if (!window.console['warn']      ) window.console.warn        = function(){};
+    if (!window.console['profile']   ) window.console.profile     = function(){};
+    if (!window.console['profileEnd']) window.console.profileEnd  = function(){};
+    if (!window.console['trace']     ) window.console.trace       = function(){};
+    if (!window.console['error']     ) window.console.error       = function(){};
+  }
+  
+  
+  function getAbsolutePosition(element) {
+     var r = { x: element.offsetLeft, y: element.offsetTop };
+     if (element.offsetParent) {
+       var tmp = getAbsolutePosition(element.offsetParent);
+       r.x += tmp.x;
+       r.y += tmp.y;
+     }
+     return r;
+   };
+</script>
+<script type="text/javascript" src="sylvester.js"></script>
+<script type="text/javascript" src="Pad3d.js" ></script>
+<script type="text/javascript" src="GeometryUtils.js" ></script>
+<script type="text/javascript" src="Polarizer.js" ></script>
+
+
+<!-- Main CSS sheet for basic layout, custom mods. -->
+<link rel="stylesheet" href="style.css" type="text/css" media="all"/>
+<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.6.custom.css" rel="Stylesheet" media="all"/>
+</head>
+
+
+<body>
+<div id='everything'>
+      <input type="checkbox" id='run_checkbox' value="Run" checked='true'/> Run<br />
+      <div id="viewport" class ="pad" style="height:500px; border:5px solid black;"></div> 
+      <div id="triD-controls">
+          <span class="trid-ctl trid-zoom-in"   >Zoom In</span>
+          <span class="trid-ctl trid-zoom-out"  >Zoom Out</span>
+          <span class="trid-ctl trid-pan-left"  >Pan Left</span>
+          <span class="trid-ctl trid-pan-right" >Pan Right</span>
+          <span class="trid-ctl trid-pan-up"    >Pan Up</span>
+          <span class="trid-ctl trid-pan-down"  >Pan Down</span>
+          <span class="trid-ctl trid-pan-upstream"    >Pan Upstream</span>
+          <span class="trid-ctl trid-pan-downstream"  >Pan Downstream</span>
+          <input type="checkbox" class="trid-ctl trid-autorotate" id="trid-check1" /><label for="trid-check1">AutoRotate</label>
+          <span class="trid-ctl trid-reset"     >Reset</span>
+          <span class="trid-ctl-mouse-set">
+          		<input type="radio" class="trid-ctl trid-ctl-mouse-rotate" name="trid-radio" id="trid-radio1" value="rotate" checked="yes"/><label for="trid-radio1">Mouse Rotate</label>
+          		<input type="radio" class="trid-ctl trid-ctl-mouse-pan"    name="trid-radio" id="trid-radio2" value="pan" />             <label for="trid-radio2">Mouse Pan</label>
+          </span>
+          <span class="trid-ctl-view-set">
+            <input type="radio" class="trid-ctl trid-ctl-view-3D" name="trid-radio-view" id="trid-radio-view1" value="3D" checked="yes"/><label for="trid-radio-view1">3D</label>
+            <input type="radio" class="trid-ctl trid-ctl-view-xz" name="trid-radio-view" id="trid-radio-view2" value="XZ" /><label for="trid-radio-view2">XZ</label>
+            <input type="radio" class="trid-ctl trid-ctl-view-yz" name="trid-radio-view" id="trid-radio-view3" value="YZ" /><label for="trid-radio-view3">YZ</label>
+            <input type="radio" class="trid-ctl trid-ctl-view-xy" name="trid-radio-view" id="trid-radio-view4" value="XY" /><label for="trid-radio-view4">XY</label>
+          </span>
+      </div>
+      
+<input myPol='0' class='polbox' type="checkbox"   checked='true'/><span style="width:100px;">Polarizer 1</span>
+<div   myPol='0' class='polslider' style="display: inline-block; width: 400px; height: 10px;"></div><br/>
+<input myPol='1' class='polbox' type="checkbox"   /><span style="width:100px;">Polarizer 2</span>
+<div   myPol='1' class='polslider' style="display: inline-block; width: 400px; height: 10px;"></div><br/>
+<input myPol='2' class='polbox' type="checkbox"   checked='true'/><span style="width:100px;">Polarizer 3</span>
+<div   myPol='2' class='polslider' style="display: inline-block; width: 400px; height: 10px;"></div><br/>
+
+
+
+</div> <!-- Everything -->
+
+<span id='fps'></span>
+</body>
+</html>
