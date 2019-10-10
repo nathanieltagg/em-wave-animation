@@ -99,9 +99,9 @@ Polarize3d.prototype.Rebuild = function()
   if(this.gSetupDirty) {
     // Draw the scenery elements.
     this.objects = [];
-    // for(var ip=0;ip<polarizers.length;ip++) {
-    //   this.AddPolarizer(polarizers[ip].z, polarizers[ip].angle);
-    // }
+    for(var ip=0;ip<polarizers.length;ip++) {
+      this.AddPolarizer(polarizers[ip].z, polarizers[ip].angle);
+    }
     
     this.scenery_objects = this.objects.slice(0); // make a copy
   } else {
@@ -119,8 +119,17 @@ Polarize3d.prototype.Rebuild = function()
   var amp = 100;
 
   // this.AddCircularWave(wavelength,phase,1.0,-500,polarizers[0].z);
-   this.AddLinearWave(amp,wavelength,phase,0,-500,500,true,true);
-    
+   this.AddLinearWave(amp,wavelength,phase,0,-500,polarizers[0].z);
+   this.AddLinearWave(amp,wavelength,phase,Math.PI/2,-500,polarizers[0].z);
+   for(var ip=1;ip<polarizers.length;ip++) {
+     this.AddLinearWave(amp,wavelength,phase,polarizers[ip-1].angle,polarizers[ip-1].z,polarizers[ip].z);
+     var ca =  Math.cos(polarizers[ip].angle - polarizers[ip-1].angle);
+     amp = amp*ca*ca;
+   }
+   
+  var ip = polarizers.length -1;
+  this.AddLinearWave(amp,wavelength,phase,polarizers[ip].angle,polarizers[ip].z,500);
+   
   // this.CreateFrame();
   // if ($('#ctl-show-hitmap-tracks').is(':checked')) {  this.CreateTracks(); }
   // if ($('#ctl-show-hitmap-hits').is(':checked')) {  this.CreateStrips(); }
@@ -129,96 +138,24 @@ Polarize3d.prototype.Rebuild = function()
   this.Draw();
 }
 
-function NormalizeVector(v)
-{
-  var  dd = (v.x*v.x + v.y*v.y + v.z*v.z);
-  if(dd<=0) return;
-  var d = Math.sqrt(dd);
-  v.x /= d;
-  v.y /= d;
-  v.z /= d;
-}
-
-Polarize3d.prototype.AddArrow = function(x,y,z,x2,y2,z2,head_size,width,color,obj)
-{
-  var n = {x: x2-x, y: y2-y, z: z2-z};
-  NormalizeVector(n);
-  this.AddLine(x,y,z,x2,y2,z2,width,color,obj);
-  // Vector direction
-
-  // find a perpendicular vector. This is a cheat.
-  // var u = {x: n.y, y:n.x, z:0};
-  // NormalizeVector(u);
-  // var v = {x: (n.y*u.z - n.z*u.y),
-  //          y: (n.z*u.x - n.x*u.z),
-  //          z: (n.x*u.y - n.y*u.x)
-  // };
-  // NormalizeVector(v);
-  var v = {x:0, y:0, z:1};
-  
-  
-  // this.AddLine(x2,y2,z2,
-  //             x2 - n.x*head_size + u.x*head_size,
-  //             y2 - n.y*head_size + u.y*head_size,
-  //             z2 - n.z*head_size + u.z*head_size,
-  //             width, color, obj);
-  // this.AddLine(x2,y2,z2,
-  //             x2 - n.x*head_size - u.x*head_size,
-  //             y2 - n.y*head_size - u.y*head_size,
-  //             z2 - n.z*head_size - u.z*head_size,
-  //             width, color, obj);
-  this.AddLine(x2,y2,z2,
-              x2 - 2*n.x*head_size + v.x*head_size,
-              y2 - 2*n.y*head_size + v.y*head_size,
-              z2 - 2*n.z*head_size + v.z*head_size,
-              width, color, obj);
-  this.AddLine(x2,y2,z2,
-              x2 - 2*n.x*head_size - v.x*head_size,
-              y2 - 2*n.y*head_size - v.y*head_size,
-              z2 - 2*n.z*head_size - v.z*head_size,
-              width, color, obj);
-    
-
-}
-
-
-Polarize3d.prototype.AddLinearWave = function(amp,wavelength,phase,polarization,from_z,to_z,show_vectors,show_bfield)
+Polarize3d.prototype.AddLinearWave = function(amp,wavelength,phase,polarization,from_z,to_z)
 {
   // console.log(wavelength,phase,polarization,from_z,to_z);
   var n = 0;
   var Ex_last;
   var Ey_last;
-  var Bx_last;
-  var By_last;
   var z_last;
-  var i = 0;
-  
-  this.AddLine(0,0,from_z,0,0,to_z,1,'black',null);
-  
-  for(var z=from_z; z<=to_z; z+=5) {
+  for(var z=from_z; z<=to_z; z+=10) {
     var E = amp*Math.sin(phase - twopi*z/wavelength );    
     var Ex = Math.cos(polarization)*E;
     var Ey = Math.sin(polarization)*E;
-
-    var Bx = Math.cos(polarization+twopi/4)*E;
-    var By = Math.sin(polarization+twopi/4)*E;
     // console.debug(E,Ex,Ey);
     if(n>0) {
-      this.AddLine(Ex_last,Ey_last,z_last,Ex,Ey,z,2,'blue',null);
-      if(show_bfield )this.AddLine(Bx_last,By_last,z_last,Bx,By,z,2,'red',null);                       
-      
-    } else n++;  
-    if(show_vectors && (i%4==0)) {
-      this.AddArrow(0,0,z,Ex,Ey,z,Math.abs(amp*0.05),1,'blue',null);
-      if(show_bfield )
-        this.AddArrow(0,0,z,Bx,By,z,Math.abs(amp*0.05),1,'red',null);
-    }  
+      this.AddLine(Ex_last,Ey_last,z_last,Ex,Ey,z,1,'black',null);
+    } else n++;
     Ex_last = Ex;
     Ey_last = Ey;
-    Bx_last = Bx;
-    By_last = By;
     z_last  = z;
-    i++;
   }
 }
 
