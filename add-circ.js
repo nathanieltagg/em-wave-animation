@@ -74,6 +74,7 @@ $(function(){
   
   $("select").change(ChangeSliders);
   ChangeSliders();
+  
 
   doTimer();
 });
